@@ -51,11 +51,11 @@ def ValidDoB ():    # Function that requires user to input their date of birth i
 def username(): # Function that requires user to input their desired username however false is returned if there are special characters or any numbers.
     try:
         while True:
-            user = input("Please enter a username. The username must be between 3 characters or more and not include any numbers.: ")
+            user = input("Please enter a username. The username must be between 3 characters or more and not include any numbers: ")
             if not user:
                 print("Username cannot be empty. Please try again.")
             elif len(user) < 3:
-                print ("Your password is less than 3 characters. Please try again.") 
+                print ("Your username is less than 3 characters. Please try again.") 
                 continue
             elif any(char.isdigit() for char in user):
                 print ("Your username cannot contain any numbers. Please try again.")
@@ -69,6 +69,26 @@ def username(): # Function that requires user to input their desired username ho
         print (f"There seems to be an error {e}")
         return False, None
 
+def password ():
+    try:
+        while True:
+            password = input ("Please enter a password. The password must between 3 and 10 characters and can contain numbers and special characters: ")
+            if not password:
+                print ("Password cannot be empty. Please try again.")
+            elif len(password) < 3:
+                print ("Your password is less than 3 characters and more than 11. Please try again.")
+                continue
+            elif len(password) > 10:
+                print ("Your password is less than 3 characters and more than 11. Please try again.")
+                continue
+            print ("You entered a valid password. Thank you for creating your record.")
+            return True, password
+    except Exception as e:
+        print (f"There was an error in the password function: {e}")
+        return False, None      
+
+
+
 
 def main ():    # Function that pieces together the main workflow of the program after the functions before are written.
     valid_fname, first_name = firstname()
@@ -79,10 +99,14 @@ def main ():    # Function that pieces together the main workflow of the program
             if dob:
                 valid_username, user_name = username()
                 if valid_username:
-                    print ("All information is correct. Thank you!")
-                    WriteToFile(first_name, last_name, dob, user_name, datafile)
+                    valid_password, pass_word = password()
+                    if valid_password:
+                        print ("All information is correct. Thank you!")
+                        WriteToFile(first_name, last_name, dob, user_name, pass_word, datafile)
+                    else:
+                        print ("Your password is invalid")    
                 else:
-                    print ("Your password is invalid")
+                    print ("Your username is invalid")
             else:
                 print ("Please enter a valid Date of Birth with the correct format YYYY-MM-DD ")
         else:
@@ -93,10 +117,10 @@ def main ():    # Function that pieces together the main workflow of the program
                 
 
 
-def WriteToFile(firstname, lastname, dob, username, datafile):  # 
+def WriteToFile(firstname, lastname, dob, username, password, datafile):  # 
     try:
         
-        filetowrite = f"{firstname},{lastname},{dob},{username}"
+        filetowrite = f"{firstname},{lastname},{dob},{username}, {password}"
         
         
         with open(datafile, "a") as file:
