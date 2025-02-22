@@ -54,13 +54,17 @@ def username(): # Function that requires user to input their desired username ho
             user = input("Please enter a username. The username must be between 3 characters or more and not include any numbers.: ")
             if not user:
                 print("Username cannot be empty. Please try again.")
+            elif len(user) < 3:
+                print ("Your password is less than 3 characters. Please try again.") 
                 continue
-            if len(user) < 3 or not any(char.isdigit() for char in user) or re.search(r"[^\w\s]",user):
-                print ("Your password has been successfully added to your account")
-                return True, user
-        else:
-            return False, None
-
+            elif any(char.isdigit() for char in user):
+                print ("Your username cannot contain any numbers. Please try again.")
+                continue
+            elif re.search(r"[^\w]",user):
+                print ("Your username cannot contain any special characters. Please try again.")
+                continue
+            print ("Your username is valid. It has been added to the record. Thank you.")
+            return True, user
     except Exception as e:
         print (f"There seems to be an error {e}")
         return False, None
@@ -89,7 +93,7 @@ def main ():    # Function that pieces together the main workflow of the program
                 
 
 
-def WriteToFile(firstname, lastname, dob, username, datafile):
+def WriteToFile(firstname, lastname, dob, username, datafile):  # 
     try:
         
         filetowrite = f"{firstname},{lastname},{dob},{username}"
