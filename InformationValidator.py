@@ -46,7 +46,15 @@ def ValidDoB ():    # Function that requires user to input their date of birth i
         try:
             dob = input ("Please enter a valid Date of Birth using the format dd/mm/yyyy: ")
             datetime.strptime(dob,"%d/%m/%Y") 
-            return dob
+            day, month, year = dob.split("/")
+            day = int(day)
+            month = int(month)
+            if day < 1 or day > 31:
+                print ("Please enter a valid date of birth.")
+            if month < 1 or month > 12:
+                print ("Please enter a valid date of birth.")
+            else:
+                return dob
         except ValueError as ve:
             print (f"There has been an error {ve}")
 
@@ -66,11 +74,26 @@ def username(): # Function that requires user to input their desired username ho
             elif re.search(r"[^\w]",user):
                 print ("Your username cannot contain any special characters. Please try again.")
                 continue
-            print ("Your username is valid. It has been added to the record. Thank you.")
-            return True, user
+            
+            
+            with open (datafile, "r") as file:
+                reader = csv.reader(file)
+    
+                for row in reader:
+                    if row:
+                        existing_username = row[3]
+                        if user.lower() == existing_username.lower():
+                            print ("Sorry your username is taken. Please use another.")
+                            break
+                else:
+                    print ("Your username is valid. It has been added to the record. Thank you.")
+                    return True, user
     except Exception as e:
         print (f"There seems to be an error {e}")
         return False, None
+
+
+
 
 def password ():    # Function that requires the user to input their desired password from 3 to 10 characters long only.
     try:
@@ -99,8 +122,13 @@ def email ():   # Function that takes input from the users email address.
             if not email:
                 print ("Your email is invalid. Please try again")
             elif re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
-                print ("Your email is invalid. Please try again")
-                return True, email
+                while True:
+                    email2 = input ("Please confirm your email: ")
+                    if email2 == email:
+                        return True, email
+                    else:
+                        print ("Emails do not match.")
+                else: ("Your email is invalid. Please try again")
     except Exception as e:
         print (f"There was an error in the email function {e}")
         return False, None      
