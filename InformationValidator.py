@@ -75,21 +75,24 @@ def username(): # Function that requires user to input their desired username ho
                 print ("Your username cannot contain any special characters. Please try again.")
                 continue
             
-            
-            with open (datafile, "r") as file:
-                reader = csv.reader(file)
+            try:
+                with open (datafile, "r") as file:
+                    reader = csv.reader(file)
     
-                for row in reader:
-                    if row:
-                        existing_username = row[3]
-                        if user.lower() == existing_username.lower():
-                            print ("Sorry your username is taken. Please use another.")
-                            break
-                else:
-                    print ("Your username is valid. It has been added to the record. Thank you.")
-                    return True, user
+                    for row in reader:
+                        if row:
+                            existing_username = row[3]
+                            if user.lower() == existing_username.lower():
+                                print ("Sorry your username is taken. Please use another.")
+                                break
+                    else:
+                        print ("Your username is valid. It has been added to the record. Thank you.")
+                        return True, user
+            except FileNotFoundError:
+                print (f"New User")
+                return True, user
     except Exception as e:
-        print (f"There seems to be an error {e}")
+        print ("There seems to be an error {e}")
         return False, None
 
 
@@ -133,6 +136,21 @@ def email ():   # Function that takes input from the users email address.
         print (f"There was an error in the email function {e}")
         return False, None      
 
+def login_user (username, password):
+    try:
+        with open(datafile, "r") as file:
+            reader = csv.reader(file)
+
+            for row in reader:
+                if row:
+                    saved_username = row[3]
+                    saved_password = row[4]
+                    if saved_username.lower() == username.lower() and bcrypt.checkpw(password.encode('utf-8'),saved_password):
+                        return True
+        return False
+
+    except Exception as e:
+        print(f"Error occurred in the valid login function {e}")   
 
 
 def main ():    # Function that pieces together the main workflow of the program after the functions before are written.
@@ -148,8 +166,13 @@ def main ():    # Function that pieces together the main workflow of the program
                     if valid_password:
                         valid_email, e_mail = email()
                         if valid_email:
-                            print ("All information is correct. Thank you!")
                             WriteToFile(first_name, last_name, dob, user_name, pass_word, e_mail, datafile)
+                            print ("User registration successful!")  
+                            login_success = login_user(user_name, pass_word)
+                            if login_success:
+                                print ("Login Successful")
+                            else:
+                                print("Login Failed") 
                         else:
                             print ("Your email is invalid")    
                     else:
