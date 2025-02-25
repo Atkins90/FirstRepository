@@ -136,7 +136,7 @@ def email ():   # Function that takes input from the users email address.
         print (f"There was an error in the email function {e}")
         return False, None      
 
-def login_user (username, password):
+def login_user (username, password):    # Function that checks a username and password against each other to return True.
     try:
         with open(datafile, "r") as file:
             reader = csv.reader(file)
@@ -145,15 +145,27 @@ def login_user (username, password):
                 if row:
                     saved_username = row[3]
                     saved_password = row[4]
-                    if saved_username.lower() == username.lower() and bcrypt.checkpw(password.encode('utf-8'),saved_password):
+                    if isinstance(saved_password, str):
+                        saved_password = saved_password.encode('utf-8')
+                    if isinstance(password, str):
+                        password = password.encode('utf-8')    
+                    if saved_username.lower() == username.lower() and bcrypt.checkpw(password, saved_password):
                         return True
         return False
 
     except Exception as e:
         print(f"Error occurred in the valid login function {e}")   
 
+def user_login ():
+    login_username = input ("Please enter your username: ")
+    login_password = input ("Please enter your password: ")
+    login_success = login_user(login_user, login_password)
+    if login_success:
+        print ("Login Successful")
+    else:
+        print("Login Failed") 
 
-def main ():    # Function that pieces together the main workflow of the program after the functions before are written.
+def user_registration ():    # Function that pieces together the main workflow of the program after the functions before are written.
     valid_fname, first_name = firstname()
     if valid_fname:
         valid_lname, last_name = lastname()
@@ -167,12 +179,7 @@ def main ():    # Function that pieces together the main workflow of the program
                         valid_email, e_mail = email()
                         if valid_email:
                             WriteToFile(first_name, last_name, dob, user_name, pass_word, e_mail, datafile)
-                            print ("User registration successful!")  
-                            login_success = login_user(user_name, pass_word)
-                            if login_success:
-                                print ("Login Successful")
-                            else:
-                                print("Login Failed") 
+                            print ("User registration successful!")   
                         else:
                             print ("Your email is invalid")    
                     else:
@@ -187,6 +194,18 @@ def main ():    # Function that pieces together the main workflow of the program
         print ("Please enter a valid first name. A minimum of 3 characters are required. ")
                 
                 
+def main ():
+    while True:
+        action = input ("Choose an action:\n1. Register\n2. Login\n3. Exit")
+        if action == "1":
+            user_registration()
+        elif action == "2":
+            user_login()
+        elif action == "3":
+            print ("Exiting")
+            break    
+        else:
+            print ("Invalid choice. Please try again.")
 
 
 def WriteToFile(firstname, lastname, dob, username, password, email, datafile):  # 
@@ -198,7 +217,7 @@ def WriteToFile(firstname, lastname, dob, username, password, email, datafile): 
             if not file_exists:
                 headers = ["First Name", "Last Name", "Date of Birth", "Username", "Password", "Email"]
                 writer.writerow(headers)
-            writer.writerow([firstname, lastname, dob, username, password, email])
+            writer.writerow([firstname, lastname, dob, username, password.decode('utf-8'), email])
             print("Data written to the Data file successfully.")
     
     except Exception as e:
